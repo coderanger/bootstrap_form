@@ -20,7 +20,14 @@ module BootstrapForm
           label(name, options[:label], class: 'control-label') +
           content_tag(:div, class: 'controls') do
             help = object.errors[name].any? ? object.errors[name].join(', ') : options[:help]
-            help = content_tag(@help_tag, class: @help_css) { help } if help
+            help_tag, help_css = if options.fetch(:help_style, '').to_sym == :block
+              [:p, 'help-block']
+            elsif options.fetch(:help_style, '').to_sym == :inline
+              [:span, 'help-inline']
+            else
+              [@help_tag, @help_css]
+            end
+            help = content_tag(help_tag, class: help_css) { help } if help
             args << options.except(:label, :help)
             super(name, *args) + help
           end
