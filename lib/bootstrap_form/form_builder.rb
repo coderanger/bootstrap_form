@@ -4,13 +4,7 @@ module BootstrapForm
 
     def initialize(object_name, object, template, options, proc)
       super
-      if options.fetch(:help, '').to_sym == :block
-        @help_tag = :p
-        @help_css = 'help-block'
-      else
-        @help_tag = :span
-        @help_css = 'help-inline'
-      end
+      @help_style = options.fetch(:help, :inline)
     end
 
     %w{text_field text_area password_field collection_select file_field date_select select}.each do |method_name|
@@ -20,12 +14,10 @@ module BootstrapForm
           label(name, options[:label], class: 'control-label') +
           content_tag(:div, class: 'controls') do
             help = object.errors[name].any? ? object.errors[name].join(', ') : options[:help]
-            help_tag, help_css = if options.fetch(:help_style, '').to_sym == :block
+            help_tag, help_css = if options.fetch(:help_style, @help_style).to_sym == :block
               [:p, 'help-block']
-            elsif options.fetch(:help_style, '').to_sym == :inline
-              [:span, 'help-inline']
             else
-              [@help_tag, @help_css]
+              [:span, 'help-inline']
             end
             help = content_tag(help_tag, class: help_css) { help } if help
             args << options.except(:label, :help)
