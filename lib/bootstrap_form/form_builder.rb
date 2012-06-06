@@ -8,7 +8,7 @@ module BootstrapForm
     end
 
     %w{text_field text_area password_field collection_select file_field date_select select}.each do |method_name|
-      define_method(method_name) do |name, *args|
+      define_method(method_name) do |name, *args, &block|
         options = args.extract_options!.symbolize_keys!
         content_tag :div, class: "control-group#{(' error' if object.errors[name].any?)}"  do
           label(name, options[:label], class: 'control-label') +
@@ -20,6 +20,7 @@ module BootstrapForm
               [:span, 'help-inline']
             end
             help = content_tag(help_tag, class: help_css) { help } if help
+            help = block.call + help if block
             args << options.except(:label, :help)
             super(name, *args) + help
           end
