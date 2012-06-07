@@ -19,8 +19,14 @@ module BootstrapForm
             else
               [:span, 'help-inline']
             end
-            help = content_tag(help_tag, class: help_css) { help } if help
-            help = block.call + help if block
+            if help || block
+              help = content_tag(help_tag, class: help_css) do
+                content = ''
+                content << ERB::Util.html_escape(help) if help
+                content << content_tag('span', class: 'extra', &block) if block
+                content.html_safe
+              end
+            end
             args << options.except(:label, :help)
             super(name, *args) + help
           end
